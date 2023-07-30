@@ -1226,3 +1226,32 @@ def test_torch_cholesky_ex(
         input=x,
         upper=upper,
     )
+
+
+@handle_frontend_test(
+    fn_tree="torch.linalg.ldl_factor",
+    dtype_and_x=_get_dtype_and_matrix(square=True, batch=True),
+    upper=st.booleans()
+)
+def test_torch_ldl_factor(
+    *,
+    dtype_and_x,
+    upper,
+    on_device,
+    fn_tree,
+    frontend,
+    test_flags,
+):
+    dtype, x = dtype_and_x
+    x = np.matmul(x.T, x) + np.identity(x.shape[0])
+
+    helpers.test_frontend_function(
+        input_dtypes=dtype,
+        frontend=frontend,
+        test_flags=test_flags,
+        fn_tree=fn_tree,
+        on_device=on_device,
+        rtol=1e-01,
+        input=x,
+        upper=upper,
+    )

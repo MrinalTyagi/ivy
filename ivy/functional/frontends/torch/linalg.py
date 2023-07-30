@@ -370,3 +370,22 @@ def cholesky_ex(input, *, upper=False, check_errors=False, out=None):
             matrix = input * math.nan
             info = ivy.ones(input.shape[:-2], dtype=ivy.int32)
             return matrix, info
+
+
+@to_ivy_arrays_and_back
+def ldl_factor(input, *, hermitian=False, out=None):
+    """
+    Reference: https://en.wikipedia.org/wiki/Cholesky_decomposition
+    
+    A = LDL* (LDL decomposition)
+
+    Using Cholesky Decomposition, we obtain C. S is the diagonal matrix of C.
+    Using C and S, we get:
+    L = C(S^-1)
+    D = S^2
+    """
+    c = ivy.cholesky(input, upper=False, out=None)
+    s = ivy.diag(ivy.diag(c, 0))
+    l = ivy.matmul(c, ivy.inv(s))
+    d = ivy.pow(s, 2)
+    return l, d
